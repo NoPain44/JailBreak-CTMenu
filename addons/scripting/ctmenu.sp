@@ -27,6 +27,9 @@ weapon_recoil_view_punch_extra, mp_teammates_are_enemies, sv_airaccelerate, sm_p
 public void OnPluginStart( )
 {
 	RegConsoleCmd( "sm_ctmenu", Ctmenu );
+	RegConsoleCmd( "sm_revmenu", Rev_Menu );
+	RegConsoleCmd( "sm_c4", Bury_Menu );
+	RegConsoleCmd( "sm_ffmenu", FF_Menu );
 	
 	HookEvent( "player_spawn", Event_PlayerSpawn );
 	HookEvent( "round_start", Event_RoundStart );
@@ -97,7 +100,7 @@ public Action Event_RoundStart( Event event, const char[ ] name, bool dontbroadc
 
 public Action Ctmenu( int client, int args )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		if( g_game == 5 )
 		{
@@ -132,7 +135,7 @@ public int Ctmenu_Handler( Menu menu, MenuAction action, int param1, int param2 
 				{
 					for( int i = 1; i <= MaxClients; i++ )
 					{
-						if( IsClientConnected( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
+						if( IsClientInGame( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
 						{
 							SetClientGod( i, 0 ); 
 						}
@@ -144,7 +147,7 @@ public int Ctmenu_Handler( Menu menu, MenuAction action, int param1, int param2 
 				{
 					for( int i = 1; i <= MaxClients; i++ )
 					{
-						if( IsClientConnected( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
+						if( IsClientInGame( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
 						{
 							SetClientGod( i, 1 ); 
 						}
@@ -181,7 +184,7 @@ public int Ctmenu_Handler( Menu menu, MenuAction action, int param1, int param2 
 }
 public Action Cell_Menu( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Cell_Menu_Handler );
 		menu.SetTitle( "Hücre Kapısı" );
@@ -230,7 +233,7 @@ public int Cell_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 }
 public Action CTSettings( client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( CTSettings_Handler );
 		menu.SetTitle( "CTMenu Ayarlar Menusu" );
@@ -268,7 +271,7 @@ public int CTSettings_Handler( Menu menu, MenuAction action, int param1, int par
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsClientConnected( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsClientInGame( i ) && GetClientTeam( i ) == 2 )
 					{
 						Client_RemoveAllWeapons( i, "weapon_knife" );
 					}
@@ -282,7 +285,7 @@ public int CTSettings_Handler( Menu menu, MenuAction action, int param1, int par
 				{
 					for( int i = 1; i <= MaxClients; i++ )
 					{
-						if( IsClientConnected( i ) )
+						if( IsClientInGame( i ) )
 						{
 							SDKUnhook( i, SDKHook_WeaponCanUse, WeaponUse );
 						}
@@ -295,7 +298,7 @@ public int CTSettings_Handler( Menu menu, MenuAction action, int param1, int par
 				{
 					for( int i = 1; i <= MaxClients; i++ )
 					{
-						if( IsClientConnected( i ) )
+						if( IsClientInGame( i ) )
 						{
 							SDKHook( i, SDKHook_WeaponCanUse, WeaponUse );
 						}
@@ -339,7 +342,7 @@ public int CTSettings_Handler( Menu menu, MenuAction action, int param1, int par
 }
 public CTGravity( client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( CTGravity_Handler );
 		menu.SetTitle( "Gravity Ayar Menusu" );
@@ -366,7 +369,7 @@ public int CTGravity_Handler( Menu menu, MenuAction action, int param1, int para
 }
 public Action CTMenuler( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( CTMenuler_Handler );
 		menu.SetTitle( "Menuler" );
@@ -392,7 +395,7 @@ public int CTMenuler_Handler( Menu menu, MenuAction action, int param1, int para
 			}
 			case 1:
 			{
-				Bury_Menu( param1 );
+				Bury_Menu( param1, 2 );
 			}
 			case 2:
 			{
@@ -400,7 +403,7 @@ public int CTMenuler_Handler( Menu menu, MenuAction action, int param1, int para
 			}
 			case 3:
 			{
-				Rev_Menu( param1 );
+				Rev_Menu( param1, 2 );
 			}
 			case 4:
 			{
@@ -411,16 +414,16 @@ public int CTMenuler_Handler( Menu menu, MenuAction action, int param1, int para
 }
 public Action Freeze_Menu( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Freeze_Menu_Handler );
 		menu.SetTitle( "Dondurma Menüsü" );
 		menu.AddItem( "allfreeze", "Tüm Mahkumlari Dondur" );
 		menu.AddItem( "allunfreeze", "Tüm Mahkumlari Çöz" );
-		menu.AddItem( "listfreeze", "Listeden Sectiğin Mahkumları Dondur" );
-		menu.AddItem( "listunfreeze", "Listeden Sectiğin Mahkumları Çöz" );
-		menu.AddItem( "aimfreeze", "Aimin Önündeki Mahkumları Dondur" );
-		menu.AddItem( "aimunfreeze", "Aimin Önündeki Mahkumları Çöz" );
+		menu.AddItem( "listfreeze", "Mahkum Dondur ( Listeden Seç )" );
+		menu.AddItem( "listunfreeze", "Mahkumları Çöz ( Listeden Seç )" );
+		menu.AddItem( "aimfreeze", "Mahkum Dondur ( Aimin Önündeki )" );
+		menu.AddItem( "aimunfreeze", "Mahkumları Çöz ( Aimin Önündeki ) " );
 		menu.AddItem( "amenu", "Bir Önceki Menüye Dön" );
 		SetMenuPagination( menu, MENU_NO_PAGINATION );
 		menu.Display( client, MENU_TIME_FOREVER );
@@ -438,7 +441,7 @@ public int Freeze_Menu_Handler( Menu menu, MenuAction action, int param1, int pa
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						ListMenuMode( param1, i, 1 );
 					}
@@ -450,7 +453,7 @@ public int Freeze_Menu_Handler( Menu menu, MenuAction action, int param1, int pa
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						ListMenuMode( param1, i, 0 );
 					}
@@ -503,18 +506,19 @@ public int Freeze_Menu_Handler( Menu menu, MenuAction action, int param1, int pa
 		}
 	}
 }
-public Action Bury_Menu( int client )
+public Action Bury_Menu( int client, int args )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Bury_Menu_Handler );
 		menu.SetTitle( "Gömme Menüsü" );
 		menu.AddItem( "allbury", "Gömülmeyen Tüm Mahkumları Göm" );
 		menu.AddItem( "allunbury", "Gömülen Tüm Mahkumları Çıkar" );
-		menu.AddItem( "listbury", "Listeden Gömülmeyen Mahkumu Göm" );
-		menu.AddItem( "listunbury", "Listeden Gömülen Mahkumları Çıkar" );
-		menu.AddItem( "aimbury", "Aimin Önündeki Mahkumları Göm" );
-		menu.AddItem( "aimunbury", "Aimin Önündeki Mahkumları Çıkar" );
+		menu.AddItem( "listbury", "Mahkumu Göm ( Listeden Seç )" );
+		menu.AddItem( "listunbury", "Mahkumumu Çıkar ( Listeden Seç )" );
+		menu.AddItem( "aimbury", "Mahkumu Göm ( Aimin Önündeki )" );
+		menu.AddItem( "aimunbury", "Mahkumumu Çıkar ( Aimin Önündeki )" );
+		menu.AddItem( "sureligom", "Süreli Mahküm Göm" );
 		SetMenuPagination( menu, MENU_NO_PAGINATION );
 		menu.AddItem( "amenu", "Bir Önceki Menüye Dön" );
 		menu.Display( client, MENU_TIME_FOREVER );
@@ -532,25 +536,25 @@ public int Bury_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
 					{
 						ListMenuMode( param1, i, 2 );
 					}
 				}
 				CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan gömülmeyen tüm mahkumları {darkblue}[ {darkred}GÖMDÜ {darkblue}]", param1 );
-				Bury_Menu( param1 );
+				Bury_Menu( param1, 2 );
 			}
 			case 1:
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && IsPlayerStuck( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && IsPlayerStuck( i ) )
 					{
 						ListMenuMode( param1, i, 3 );
 					}
 				}
 				CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan gömülen tüm mahkumları {darkblue}[ {darkred}ÇIKARDI {darkblue}]", param1 );
-				Bury_Menu( param1 );
+				Bury_Menu( param1, 2 );
 			}
 			case 2:
 			{
@@ -568,7 +572,7 @@ public int Bury_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				if( target == -1 && !IsValidClient( target ) )
 				{
 					CReplyToCommand( param1, "{green}Oyuncu bulunamadi" );
-					Bury_Menu( param1 );
+					Bury_Menu( param1, 2 );
 					return;
 				}
 				else
@@ -576,13 +580,13 @@ public int Bury_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 					if( IsPlayerStuck( target ) )
 					{
 						CPrintToChat( param1, "{darkblue}[ {orange}%N {darkblue}] {green}adli oyuncu zaten gömülü", target );
-						Bury_Menu( param1 );
+						Bury_Menu( param1, 2 );
 						return;
 					}
 					ListMenuMode( param1, target, 2 );
 					CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan {darkblue}[ {orange}%N {darkblue}] {green}adlı mahkumu {darkblue}[ {darkred}GÖMDÜ. {darkblue}]", param1, target );
 				}
-				Bury_Menu( param1 );
+				Bury_Menu( param1, 2 );
 			}
 			case 5:
 			{
@@ -590,7 +594,7 @@ public int Bury_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				if( target == -1 && !IsValidClient( target ) )
 				{
 					CReplyToCommand( param1, "{green}Oyuncu bulunamadi" );
-					Bury_Menu( param1 );
+					Bury_Menu( param1, 2 );
 					return;
 				}
 				else
@@ -598,29 +602,67 @@ public int Bury_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 					if( !IsPlayerStuck( target ) )
 					{
 						CPrintToChat( param1, "{darkblue}[ {orange}%N {darkblue}] {green}adli oyuncu zaten gömülü değil", target );
-						Bury_Menu( param1 );
+						Bury_Menu( param1, 2 );
 						return;
 					}
 					ListMenuMode( param1, target, 3 );
 					CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan {darkblue}[ {orange}%N {darkblue}] {green}adlı mahkumu {darkblue}[ {darkred}ÇIKARDI. {darkblue}]", param1, target );
 				}
-				Bury_Menu( param1 );
+				Bury_Menu( param1, 2 );
 			}
 			case 6:
+			{
+				SureSec( param1 );
+			}
+			case 7:
 			{
 				CTMenuler( param1 );
 			}
 		}
 	}
 }
+public SureSec( client )
+{
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
+	{
+		Menu menu = new Menu( SureSec_Handler );
+		menu.SetTitle( "Mahkumlar Kaç Saniye Sonra Gömülsün" );
+		menu.AddItem( "10", "10 Saniye" );
+		menu.AddItem( "20", "20 Saniye" );
+		menu.AddItem( "30", "30 Saniye" );
+		menu.AddItem( "40", "40 Saniye" );
+		menu.AddItem( "50", "50 Saniye" );
+		menu.AddItem( "60", "60 Saniye" );
+		menu.Display( client, MENU_TIME_FOREVER );
+	}
+}
+public int SureSec_Handler( Menu menu, MenuAction action, int param1, int param2 )
+{
+	if( action == MenuAction_Select )
+	{
+		char info[ 32 ];
+		menu.GetItem( param2, info, sizeof( info ) );
+		g_countdown = StringToInt( info );
+		//PrintHintTextToAll( "<b><font color='#ff0000'>Mahkumların gömülmesine %i saniye kaldi.</font></b>", g_countdown );
+		SetHudTextParams( 0.38, 0.50, 1.0, 255, 0, 0, 255, 0, 6.0, 0.01, 0.01 );
+		for( int i = 1; i <= MaxClients; i++)
+		{
+			if( IsClientInGame( i ) )
+			{
+				ShowHudText(i, -1, "Mahkumların gömülmesine %i saniye kaldi.", g_countdown );
+			}
+		}
+		CreateTimer( 1.0, CountDown, _, TIMER_REPEAT );
+	}
+}
 public Action Teleport_Menu( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Teleport_Menu_Handler );
 		menu.SetTitle( "Teleport Menüsü" );
 		menu.AddItem( "alltel", "Tüm Mahkumları Yanına Çek" );
-		menu.AddItem( "listtel", "Listeden Sectiğin Mahkumları Yanına Çek" );
+		menu.AddItem( "listtel", "Mahkumu Yanına Çek( Listeden Seç )" );
 		menu.AddItem( "amenu", "Bir Önceki Menüye Dön" );
 		menu.Display( client, MENU_TIME_FOREVER );
 	}
@@ -637,7 +679,7 @@ public int Teleport_Menu_Handler( Menu menu, MenuAction action, int param1, int 
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						ListMenuMode( param1, i, 4 );
 					}
@@ -656,15 +698,15 @@ public int Teleport_Menu_Handler( Menu menu, MenuAction action, int param1, int 
 		}
 	}
 }
-public Action Rev_Menu( int client )
+public Action Rev_Menu( int client, int args )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Rev_Menu_Handler );
 		menu.SetTitle( "Revleme Menüsü" );
 		menu.AddItem( "allrevivet", "Ölmüş Tüm Mahkumlari Canlandır" );
 		menu.AddItem( "allrevivect", "Ölmüş Tüm Gardiyanlari Canlandır" );
-		menu.AddItem( "allrevive", "Listeden Sectiğin Oyuncuları Canlandır" );
+		menu.AddItem( "allrevive", "Oyuncu Canlandır( Listeden Seç )" );
 		menu.AddItem( "amenu", "Bir Önceki Menüye Dön" );
 		menu.Display( client, MENU_TIME_FOREVER );
 	}
@@ -681,25 +723,25 @@ public int Rev_Menu_Handler( Menu menu, MenuAction action, int param1, int param
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && !IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && !IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						CS_RespawnPlayer( i );
 					}
 				}
 				CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan ölmüş olan tüm mahkumları {darkblue}[ {darkred}CANLANDIRDI {darkblue}]", param1 );
-				Rev_Menu( param1 );
+				Rev_Menu( param1, 2 );
 			}
 			case 1:
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && !IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
+					if( IsClientInGame( i ) && !IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
 					{
 						CS_RespawnPlayer( i );
 					}
 				}
 				CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan ölmüş olan tüm gardiyanlari {darkblue}[ {darkred}CANLANDIRDI {darkblue}]", param1 );
-				Rev_Menu( param1 );
+				Rev_Menu( param1, 2 );
 			}
 			case 2:
 			{
@@ -715,7 +757,7 @@ public int Rev_Menu_Handler( Menu menu, MenuAction action, int param1, int param
 }
 public Action ListPlayer( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( ListPlayer_Handler );
 		menu.SetTitle( "Oyuncu Sec" );
@@ -724,7 +766,7 @@ public Action ListPlayer( int client )
 		{
 			if( g_menumode[ client ] != 5 )
 			{
-				if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+				if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 				{
 					GetClientName( i, name, sizeof( name ) );
 					Format( list, sizeof( list ), "%i", i );
@@ -733,7 +775,7 @@ public Action ListPlayer( int client )
 			}
 			if( g_menumode[ client ] == 5 )
 			{
-				if( IsClientConnected( i ) && !IsPlayerAlive( i ) )
+				if( IsClientInGame( i ) && !IsPlayerAlive( i ) )
 				{
 					GetClientName( i, name, sizeof( name ) );
 					Format( list, sizeof( list ), "%i", i );
@@ -850,7 +892,7 @@ public Action ListMenuMode( int owner, int client, int mode )
 }
 public Action Game_Menu( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( Game_Menu_Handler );
 		menu.SetTitle( "Oyun Menüsü" );
@@ -885,7 +927,15 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				CTGodVer( );
 				lastchance = false;
 				g_countdown = game_hidefirst.IntValue;
-				PrintHintTextToAll( "<b><font color='#ff0000'>Mahkumların gömülmesine %i saniye kaldi.</font></b>", g_countdown );
+				//PrintHintTextToAll( "<b><font color='#ff0000'>Mahkumların gömülmesine %i saniye kaldi.</font></b>", g_countdown );
+				SetHudTextParams( 0.38, 0.50, 1.0, 255, 0, 0, 255, 0, 6.0, 0.01, 0.01 );
+				for( int i = 1; i <= MaxClients; i++)
+				{
+					if( IsClientInGame( i ) )
+					{
+						ShowHudText( i, -1, "Mahkumların gömülmesine %i saniye kaldi.", g_countdown );
+					}
+				}
 				CreateTimer( 1.0, CountDown, _, TIMER_REPEAT );
 				CreateTimer( game_hidefirst.FloatValue + 1.0, NeYapilsin, GetClientUserId( param1 ) );
 				CPrintToChatAll( "{darkblue}[ {orange}%N {darkblue}] {green}adli gardiyan {darkblue}[ {orange}SAKLANBAÇ {darkblue}] {green}oyununu başlatti", param1 );
@@ -896,7 +946,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) )
 					{
 						if( GetClientTeam( i ) == 2 )
 						{
@@ -919,7 +969,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						ChooseWeapon( i );
 					}
@@ -928,7 +978,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 			}
 			case 3:
 			{
-				FF_Menu( param1 );
+				FF_Menu( param1, 2 );
 			}
 			case 4:
 			{
@@ -936,7 +986,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) )
 					{
 						if( GetClientTeam( i ) == 3 )
 						{
@@ -968,7 +1018,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 					CTGodVer( );
 					for( int i = 1; i <= MaxClients; i++ )
 					{
-						if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+						if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 						{
 							SetEntityRenderMode( i, RENDER_GLOW );
 							SetEntityRenderColor( i, 0, 0, 255, 255 )
@@ -983,7 +1033,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
 					{
 						SDKHook( i, SDKHook_SetTransmit, OnSetTransmit );
 						SetEntityHealth( i, 300 );
@@ -998,7 +1048,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				CTGodVer( );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 )
 					{
 						SetEntityRenderMode( i, RENDER_GLOW );
 						SetEntityRenderColor( i, 0, 255, 255, 255 )
@@ -1013,7 +1063,7 @@ public int Game_Menu_Handler( Menu menu, MenuAction action, int param1, int para
 				CTHP( param1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i )  )
+					if( IsClientInGame( i ) && IsPlayerAlive( i )  )
 					{
 						if( GetClientTeam( i ) == 3 ) 
 						{
@@ -1044,18 +1094,25 @@ public Action CountDown( Handle timer )
 		DoAction( );
 		return Plugin_Stop;
 	}
-	PrintHintTextToAll( "<b><font color='#ff0000'>Mahkumların gömülmesine %i saniye kaldi.</font></b>", g_countdown );
+	SetHudTextParams( 0.38, 0.50, 1.0, 255, 0, 0, 255, 0, 6.0, 0.01, 0.01 );
+	for( int i = 1; i <= MaxClients; i++)
+	{
+		if( IsClientInGame( i ) )
+		{
+			ShowHudText(i, -1, "Mahkumların gömülmesine %i saniye kaldi.", g_countdown );
+		}
+	}
 	return Plugin_Continue;
 }
 void DoAction( )
 {
 	for( int i = 1; i <= MaxClients; i++ )
 	{
-		if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
+		if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
 		{
 			PlayerBury( i );
 		}
-		if( IsClientConnected( i ) && !IsPlayerStuck( i ) && lastchance && GetClientTeam( i ) == 2 )
+		if( IsClientInGame( i ) && !IsPlayerStuck( i ) && lastchance && GetClientTeam( i ) == 2 )
 		{
 			ForcePlayerSuicide( i );
 			CPrintToChat( i,"{green}Verilen ek süreye rağmen gömülmediğin için öldürüldün");
@@ -1073,7 +1130,7 @@ public Action NeYapilsin( Handle timer, int userid )
 	int client = GetClientOfUserId( userid );
 	for( int i = 1; i <= MaxClients; i++ )
 	{
-		if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
+		if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
 		{
 			nonstuck += 1;
 		}
@@ -1084,7 +1141,7 @@ public Action NeYapilsin( Handle timer, int userid )
 	}
 	else
 	{
-		if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+		if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 		{
 			Menu menu = new Menu( NeYapilsin_Handler );
 			menu.SetTitle( "Gömülmeyen Mahkumlara Ne Olsun ?" );
@@ -1113,7 +1170,7 @@ public int NeYapilsin_Handler( Menu menu, MenuAction action, int param1, int par
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
 					{
 						ForcePlayerSuicide( i );
 					}
@@ -1125,7 +1182,7 @@ public int NeYapilsin_Handler( Menu menu, MenuAction action, int param1, int par
 }
 public AskNoSpread( client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( AskNoSpread_Handler );
 		menu.SetTitle( "Mermi Sekmeme( NoSpread ) ?" );
@@ -1158,7 +1215,7 @@ public int AskNoSpread_Handler( Menu menu, MenuAction action, int param1, int pa
 }
 public CTHP( client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( CTHP_Handler );
 		menu.SetTitle( "Gardiyan HP Belirle" );
@@ -1180,7 +1237,7 @@ public int CTHP_Handler( Menu menu, MenuAction action, int param1, int param2 )
 		int hp_value = StringToInt( info );
 		for( int i = 1; i <= MaxClients; i++ )
 		{
-			if( IsClientConnected( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
+			if( IsClientInGame( i ) && IsPlayerAlive( i ) && GetClientTeam( i ) == 3 )
 			{
 				SetEntityHealth( i, g_game == 4 ? hp_value*20 : hp_value );
 			}
@@ -1210,9 +1267,9 @@ public int ChooseWeapon_Handler( Menu menu, MenuAction action, int param1, int p
 		GivePlayerItem( param1, "weapon_deagle" );
 	}
 }
-public Action FF_Menu( int client )
+public Action FF_Menu( int client, int args )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( FF_Menu_Handler );
 		menu.SetTitle( "FF Menüsü" );
@@ -1236,7 +1293,7 @@ public int FF_Menu_Handler( Menu menu, MenuAction action, int param1, int param2
 				FFOnOff( 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
 					{
 						SetEntityHealth( i, 100 );
 						Client_RemoveAllWeapons( i, "weapon_knife" );
@@ -1250,7 +1307,7 @@ public int FF_Menu_Handler( Menu menu, MenuAction action, int param1, int param2
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
 					{
 						SetEntityHealth( i, 300 );
 						Client_RemoveAllWeapons( i, "weapon_knife" );
@@ -1265,7 +1322,7 @@ public int FF_Menu_Handler( Menu menu, MenuAction action, int param1, int param2
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
 					{
 						SetEntityHealth( i, 250 );
 						Client_RemoveAllWeapons( i, "weapon_knife" );
@@ -1280,7 +1337,7 @@ public int FF_Menu_Handler( Menu menu, MenuAction action, int param1, int param2
 				SetConVarInt( sv_infinite_ammo, 1 );
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 )
 					{
 						SetEntityHealth( i, 200 );
 						Client_RemoveAllWeapons( i, "weapon_knife" );
@@ -1299,7 +1356,7 @@ public Action BuryDies( Handle timer, any userid )
 }
 public Action BuryDies_Menu( int client )
 {
-	if( IsClientConnected( client ) && GetClientTeam( client ) == 3 )
+	if( IsClientInGame( client ) && GetClientTeam( client ) == 3 )
 	{
 		Menu menu = new Menu( BuryDies_Handler );
 		menu.SetTitle( "Gömülmeyen Ölür Oyunu" );
@@ -1321,7 +1378,7 @@ public int BuryDies_Handler( Menu menu, MenuAction action, int param1, int param
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 && !IsPlayerStuck( i ) )
 					{
 						PlayerBury( i );
 					}
@@ -1333,7 +1390,7 @@ public int BuryDies_Handler( Menu menu, MenuAction action, int param1, int param
 			{
 				for( int i = 1; i <= MaxClients; i++ )
 				{
-					if( IsClientConnected( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 && IsPlayerStuck( i ) )
+					if( IsClientInGame( i ) && IsPlayerAlive( i ) &&  GetClientTeam( i ) == 2 && IsPlayerStuck( i ) )
 					{
 						ForcePlayerSuicide( i );
 					}
@@ -1369,7 +1426,7 @@ void CTGodVer( )
 {
 	for( int i = 1; i <= MaxClients; i++ )
 	{
-		if( IsClientConnected( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
+		if( IsClientInGame( i ) && GetClientTeam( i ) == 3 && IsPlayerAlive( i ) )
 		{
 			SetClientGod( i, 1 );
 		}
@@ -1388,7 +1445,7 @@ void SettingsReset( )
 	SetConVarInt( sv_airaccelerate, 9999 );
 	for( int i = 1; i <= MaxClients; i++ )
 	{
-		if( IsClientConnected( i ) )
+		if( IsClientInGame( i ) )
 		{
 			g_freeze[ i ] = 0;
 			SDKUnhook( i, SDKHook_WeaponCanUse, WeaponUse );
